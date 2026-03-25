@@ -8,161 +8,116 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0f0f13;
-      color: #e0e0e0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      background: #0f0f13; color: #e0e0e0;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
     }
     .card {
-      background: #1a1a24;
-      border: 1px solid #2a2a3a;
-      border-radius: 16px;
-      padding: 40px;
-      width: 100%;
-      max-width: 560px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      background: #1a1a24; border: 1px solid #2a2a3a; border-radius: 16px;
+      padding: 40px; width: 100%; max-width: 580px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     }
-    .logo {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, #9b59b6, #6c3fc8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .subtitle { color: #888; font-size: 14px; margin-bottom: 32px; }
-    label { display: block; font-size: 13px; color: #aaa; margin-bottom: 8px; }
+    .logo { font-size: 26px; font-weight: 700; margin-bottom: 6px; background: linear-gradient(135deg, #9b59b6, #6c3fc8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: #888; font-size: 13px; margin-bottom: 28px; }
+    label { display: block; font-size: 12px; color: #aaa; margin-bottom: 6px; margin-top: 16px; }
     .input-row { display: flex; gap: 10px; }
-    input[type="text"] {
-      flex: 1;
-      background: #0f0f13;
-      border: 1px solid #2a2a3a;
-      border-radius: 10px;
-      padding: 12px 16px;
-      color: #e0e0e0;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
+    input[type="text"], input[type="password"] {
+      flex: 1; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px;
+      padding: 11px 14px; color: #e0e0e0; font-size: 13px; outline: none; transition: border-color 0.2s;
     }
-    input[type="text"]:focus { border-color: #6c3fc8; }
-    input[type="text"]::placeholder { color: #444; }
+    input:focus { border-color: #6c3fc8; }
+    input::placeholder { color: #444; }
     button {
-      background: linear-gradient(135deg, #9b59b6, #6c3fc8);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: opacity 0.2s;
+      background: linear-gradient(135deg, #9b59b6, #6c3fc8); color: white; border: none;
+      border-radius: 10px; padding: 11px 18px; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; transition: opacity 0.2s;
     }
     button:hover { opacity: 0.85; }
     button:disabled { opacity: 0.4; cursor: not-allowed; }
-    .batch-area {
-      margin-top: 24px;
-      border-top: 1px solid #2a2a3a;
-      padding-top: 24px;
-    }
+    .token-note { font-size: 11px; color: #555; margin-top: 6px; }
+    .divider { text-align: center; color: #444; font-size: 12px; margin: 22px 0; position: relative; }
+    .divider::before, .divider::after { content:''; position:absolute; top:50%; width:44%; height:1px; background:#2a2a3a; }
+    .divider::before { left:0; } .divider::after { right:0; }
     textarea {
-      width: 100%;
-      background: #0f0f13;
-      border: 1px solid #2a2a3a;
-      border-radius: 10px;
-      padding: 12px 16px;
-      color: #e0e0e0;
-      font-size: 13px;
-      outline: none;
-      resize: vertical;
-      min-height: 100px;
-      font-family: monospace;
-      transition: border-color 0.2s;
+      width: 100%; background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 10px;
+      padding: 11px 14px; color: #e0e0e0; font-size: 12px; outline: none; resize: vertical;
+      min-height: 90px; font-family: monospace; transition: border-color 0.2s;
     }
     textarea:focus { border-color: #6c3fc8; }
-    .btn-batch {
-      margin-top: 10px;
-      width: 100%;
+    .btn-full { width: 100%; margin-top: 10px; }
+    .status { margin-top: 14px; font-size: 13px; min-height: 18px; }
+    .error { color: #e74c3c; } .success { color: #2ecc71; } .info { color: #3498db; }
+    .queue { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .q-item {
+      background: #0f0f13; border: 1px solid #2a2a3a; border-radius: 8px;
+      padding: 10px 14px; font-size: 13px; display: flex; align-items: center; gap: 10px;
     }
-    .status {
-      margin-top: 20px;
-      font-size: 13px;
-      min-height: 20px;
-    }
-    .status.error { color: #e74c3c; }
-    .status.success { color: #2ecc71; }
-    .status.info { color: #3498db; }
-    .queue {
-      margin-top: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .queue-item {
-      background: #0f0f13;
-      border: 1px solid #2a2a3a;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .queue-item .name { flex: 1; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .queue-item .dl-btn {
-      padding: 6px 12px;
-      font-size: 12px;
-      border-radius: 6px;
-      flex-shrink: 0;
-    }
-    .queue-item .state { font-size: 12px; color: #888; flex-shrink: 0; }
-    .state.done { color: #2ecc71; }
-    .state.loading { color: #f39c12; }
-    .state.error { color: #e74c3c; }
-    .divider { text-align: center; color: #444; font-size: 12px; margin: 24px 0; position: relative; }
-    .divider::before, .divider::after {
-      content: ''; position: absolute; top: 50%; width: 44%; height: 1px; background: #2a2a3a;
-    }
-    .divider::before { left: 0; }
-    .divider::after { right: 0; }
+    .q-name { flex: 1; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .q-dl { padding: 5px 12px; font-size: 12px; border-radius: 6px; flex-shrink: 0; }
+    .q-state { font-size: 12px; color: #888; flex-shrink: 0; }
+    .q-state.done { color: #2ecc71; } .q-state.loading { color: #f39c12; } .q-state.err { color: #e74c3c; }
   </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">🎵 Suno DL</div>
-  <div class="subtitle">Download Suno songs as MP3</div>
+  <div class="subtitle">Download Suno songs as MP3 with song name</div>
 
-  <!-- Single download -->
-  <label>Paste Suno URL or Song ID</label>
+  <!-- Token (optional) -->
+  <label>Suno Bearer Token <span style="color:#555">(optional – needed for song name)</span></label>
+  <input type="password" id="tokenInput" placeholder="eyJhbGci..." />
+  <div class="token-note">Get from browser DevTools → Network → any suno API request → Authorization header</div>
+
+  <div class="divider">Single download</div>
+
+  <label>Suno URL or Song ID</label>
   <div class="input-row">
     <input type="text" id="urlInput" placeholder="https://suno.com/song/b1b5163c-..." />
-    <button id="dlBtn" onclick="downloadSingle()">Download</button>
+    <button onclick="downloadSingle()">⬇ Download</button>
   </div>
   <div class="status" id="status"></div>
 
-  <!-- Batch -->
-  <div class="batch-area">
-    <div class="divider">or batch download</div>
-    <label>Paste multiple URLs (one per line)</label>
-    <textarea id="batchInput" placeholder="https://suno.com/song/xxx&#10;https://suno.com/song/yyy&#10;..."></textarea>
-    <button class="btn-batch" onclick="addBatch()">Add to Queue</button>
-    <div class="queue" id="queue"></div>
-  </div>
+  <div class="divider">Batch download</div>
+
+  <label>Multiple URLs (one per line)</label>
+  <textarea id="batchInput" placeholder="https://suno.com/song/xxx&#10;https://suno.com/song/yyy"></textarea>
+  <button class="btn-full" onclick="addBatch()">Add to Queue & Download All</button>
+  <div class="queue" id="queue"></div>
 </div>
 
 <script>
+  const TOKEN_KEY = 'suno_token';
+
+  // Restore token from localStorage
+  window.onload = () => {
+    const saved = localStorage.getItem(TOKEN_KEY);
+    if (saved) document.getElementById('tokenInput').value = saved;
+  };
+
+  function getToken() {
+    const t = document.getElementById('tokenInput').value.trim();
+    if (t) localStorage.setItem(TOKEN_KEY, t);
+    return t || null;
+  }
+
   function extractId(input) {
-    input = input.trim();
-    // Match UUID in URL or raw UUID
-    const match = input.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+    const match = input.trim().match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
     return match ? match[0] : null;
   }
 
-  function mp3Url(id) {
-    return `https://cdn1.suno.ai/${id}.mp3`;
+  function sanitizeFilename(name) {
+    return name.replace(/[<>:"/\\|?*\x00-\x1f]/g, '').trim() || 'suno-song';
+  }
+
+  async function fetchSongName(id, token) {
+    if (!token) return null;
+    try {
+      const res = await fetch(`https://studio-api.suno.ai/api/feed/?ids=${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      const song = Array.isArray(data) ? data[0] : data?.clips?.[0];
+      return song?.title || song?.display_name || null;
+    } catch { return null; }
   }
 
   function setStatus(msg, type = 'info') {
@@ -172,89 +127,82 @@
   }
 
   async function triggerDownload(id, filename) {
-    const url = mp3Url(id);
-    try {
-      setStatus(`Downloading ${filename}...`, 'info');
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const blob = await res.blob();
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(a.href);
-      return true;
-    } catch (e) {
-      throw e;
-    }
+    const url = `https://cdn1.suno.ai/${id}.mp3`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
   }
 
   async function downloadSingle() {
     const input = document.getElementById('urlInput').value;
-    const btn = document.getElementById('dlBtn');
     const id = extractId(input);
     if (!id) { setStatus('Invalid URL or ID', 'error'); return; }
 
-    btn.disabled = true;
-    setStatus('Preparing download...', 'info');
+    setStatus('Fetching song info...', 'info');
+    const token = getToken();
+    const name = await fetchSongName(id, token);
+    const filename = name ? `${sanitizeFilename(name)}.mp3` : `suno-${id}.mp3`;
+
+    setStatus(`Downloading ${filename}...`, 'info');
     try {
-      await triggerDownload(id, `suno-${id}.mp3`);
-      setStatus(`✓ Downloaded suno-${id}.mp3`, 'success');
+      await triggerDownload(id, filename);
+      setStatus(`✓ Downloaded: ${filename}`, 'success');
     } catch(e) {
       setStatus(`Error: ${e.message}`, 'error');
     }
-    btn.disabled = false;
   }
 
   function addBatch() {
     const lines = document.getElementById('batchInput').value.split('\n').filter(l => l.trim());
     const queue = document.getElementById('queue');
+    const newIds = [];
     lines.forEach(line => {
       const id = extractId(line);
-      if (!id) return;
-      // Skip duplicates
-      if (document.getElementById('item-' + id)) return;
-
+      if (!id || document.getElementById('qi-' + id)) return;
       const item = document.createElement('div');
-      item.className = 'queue-item';
-      item.id = 'item-' + id;
+      item.className = 'q-item'; item.id = 'qi-' + id;
       item.innerHTML = `
-        <div class="name" title="suno-${id}.mp3">suno-${id}.mp3</div>
-        <span class="state" id="state-${id}">waiting</span>
-        <button class="dl-btn" onclick="downloadItem('${id}')">⬇ DL</button>
+        <div class="q-name" id="qn-${id}">suno-${id}.mp3</div>
+        <span class="q-state" id="qs-${id}">waiting</span>
+        <button class="q-dl" onclick="downloadQueueItem('${id}')">⬇</button>
       `;
       queue.appendChild(item);
+      newIds.push(id);
     });
-
-    if (lines.length > 0) {
-      // Auto download all
-      downloadAll();
-    }
+    if (newIds.length) downloadAllQueue(newIds);
   }
 
-  async function downloadItem(id) {
-    const stateEl = document.getElementById('state-' + id);
+  async function downloadQueueItem(id) {
+    const stateEl = document.getElementById('qs-' + id);
+    const nameEl = document.getElementById('qn-' + id);
+    stateEl.textContent = 'fetching...'; stateEl.className = 'q-state loading';
+
+    const token = getToken();
+    const name = await fetchSongName(id, token);
+    const filename = name ? `${sanitizeFilename(name)}.mp3` : `suno-${id}.mp3`;
+    nameEl.textContent = filename; nameEl.title = filename;
+
     stateEl.textContent = 'downloading...';
-    stateEl.className = 'state loading';
     try {
-      await triggerDownload(id, `suno-${id}.mp3`);
-      stateEl.textContent = '✓ done';
-      stateEl.className = 'state done';
+      await triggerDownload(id, filename);
+      stateEl.textContent = '✓ done'; stateEl.className = 'q-state done';
     } catch(e) {
-      stateEl.textContent = '✗ error';
-      stateEl.className = 'state error';
+      stateEl.textContent = '✗ error'; stateEl.className = 'q-state err';
+      stateEl.title = e.message;
     }
   }
 
-  async function downloadAll() {
-    const items = document.querySelectorAll('.queue-item');
-    for (const item of items) {
-      const id = item.id.replace('item-', '');
-      const stateEl = document.getElementById('state-' + id);
-      if (stateEl.textContent === 'waiting') {
-        await downloadItem(id);
-        await new Promise(r => setTimeout(r, 500)); // small delay between downloads
-      }
+  async function downloadAllQueue(ids) {
+    for (const id of ids) {
+      await downloadQueueItem(id);
+      await new Promise(r => setTimeout(r, 600));
     }
   }
 </script>
