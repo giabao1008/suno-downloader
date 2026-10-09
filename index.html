@@ -88,9 +88,18 @@
     ? 'https://studio-api-prod.suno.com/api/clip/'
     : '/api/clip/';
 
+  const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
+  // Accepts /song/<uuid>, a bare uuid, and the share form suno.com/s/<code>.
+  // A share link carries no uuid at all - the server resolves it by following
+  // the redirect, so pass the code through untouched.
   function extractId(input) {
-    const match = input.trim().match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-    return match ? match[0] : null;
+    const s = input.trim();
+    const uuid = s.match(UUID);
+    if (uuid) return uuid[0];
+
+    const short = s.match(/suno\.com\/s\/([A-Za-z0-9]{6,32})/i) || s.match(/^([A-Za-z0-9]{6,32})$/);
+    return short ? short[1] : null;
   }
 
   function sanitizeFilename(name) {
@@ -128,11 +137,24 @@
   //                     video stream), so it is an m4a in all but file extension.
   // cdn1.suno.ai/<id>.mp3, which this app used to guess, is now 403 MissingKey.
   async function fetchClip(id) {
+    // Resolving a share link needs the redirect that only the server can read.
+    if (ON_LOCALHOST && !UUID.test(id)) {
+      throw new Error('Share links need the deployed version - paste the full /song/<id> URL instead');
+    }
+
     const res = await fetch(CLIP_API + id);
-    if (!res.ok) throw new Error(`API HTTP ${res.status}`);
+    if (!res.ok) {
+      const reported = await res.json().then(d => d.error).catch(() => null);
+      throw new Error(reported || `API HTTP ${res.status}`);
+    }
     const data = await res.json();
 
-    if (!data.video_url) throw new Error('No downloadable audio for this song');
+    // Only reachable on localhost; the function reports this case itself.
+    if (!data.video_url) {
+      throw new Error(data.is_public === false
+        ? `"${data.title}" is private - Suno serves only an encrypted stream for it`
+        : `No downloadable audio for "${data.title}"`);
+    }
 
     const title = (data.title || '').trim() || `suno-${id}`;
     return { url: data.video_url, filename: `${sanitizeFilename(title)}.m4a`, title };
