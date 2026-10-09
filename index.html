@@ -81,12 +81,12 @@
 <script>
   // Suno only sends Access-Control-Allow-Origin for https://suno.com and
   // http://localhost:<any port>. So on localhost we call the API directly, and
-  // anywhere else we go through /suno-api/*, which vercel.json rewrites to Suno
-  // server-side - that request is same-origin, so CORS never enters the picture.
+  // anywhere else we go through our own /api/clip/<id> function, which fetches
+  // Suno server-side - that request is same-origin, so CORS never applies.
   const ON_LOCALHOST = location.hostname === 'localhost' && location.protocol === 'http:';
   const CLIP_API = ON_LOCALHOST
     ? 'https://studio-api-prod.suno.com/api/clip/'
-    : '/suno-api/clip/';
+    : '/api/clip/';
 
   function extractId(input) {
     const match = input.trim().match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
@@ -117,7 +117,7 @@
     if (ON_LOCALHOST) {
       return 'Could not reach the Suno API (offline, or Suno is down)';
     }
-    return `Could not reach ${CLIP_API} - this deployment needs the /suno-api rewrite from vercel.json`;
+    return `Could not reach ${CLIP_API} - this deployment needs the api/clip/[id].js function`;
   }
 
   // Picking the download URL is the whole trick, because two of the three the API

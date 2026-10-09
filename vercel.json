@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/suno-api/:path*",
-      "destination": "https://studio-api-prod.suno.com/api/:path*"
-    }
-  ]
-}
