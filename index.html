@@ -59,7 +59,7 @@
 <body>
 <div class="card">
   <div class="logo">🎵 Suno DL</div>
-  <div class="subtitle">Download Suno songs as MP3 with song name</div>
+  <div class="subtitle">Download Suno songs (m4a) named after the song title</div>
 
   <div class="divider">Single download</div>
 
@@ -79,7 +79,7 @@
 </div>
 
 <script>
-
+  const CLIP_API = 'https://studio-api-prod.suno.com/api/clip/';
 
   function extractId(input) {
     const match = input.trim().match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
@@ -87,10 +87,8 @@
   }
 
   function sanitizeFilename(name) {
-    return name.replace(/[<>:"/\\|?*\x00-\x1f]/g, '').trim() || 'suno-song';
+    return name.replace(/[<>:"/\\|?*\x00-\x1f]/g, '').trim().slice(0, 150) || 'suno-song';
   }
-
-
 
   function setStatus(msg, type = 'info') {
     const el = document.getElementById('status');
@@ -98,10 +96,41 @@
     el.className = 'status ' + type;
   }
 
-  async function triggerDownload(id, filename) {
-    const url = `https://cdn1.suno.ai/${id}.mp3`;
+  // Suno's API only sends Access-Control-Allow-Origin for an allowlist of origins:
+  // https://suno.com and http://localhost:<any port>. Everything else - file://
+  // (Origin: null), http://127.0.0.1, and any deployed domain - gets no CORS header,
+  // so fetch() rejects with a bare TypeError before any response is seen.
+  const ORIGIN_OK = location.hostname === 'localhost' && location.protocol === 'http:';
+
+  function explain(e) {
+    if (e instanceof TypeError && !ORIGIN_OK) {
+      return `Blocked by CORS: Suno only allows http://localhost. Serve this page from `
+           + `http://localhost:PORT (note: 127.0.0.1 and file:// do NOT work).`;
+    }
+    return e.message;
+  }
+
+  // Picking the download URL is the whole trick, because two of the three the API
+  // hands back are dead ends:
+  //   audio_url      -> literally "https://studio-api.prod.suno.com/api/forbidden"
+  //   media_urls[]   -> 200 OK but ENCRYPTED (no ftyp box, random bytes, unplayable)
+  //   video_url      -> plain AAC in an MP4 container, and audio-only (1 track, no
+  //                     video stream), so it is an m4a in all but file extension.
+  // cdn1.suno.ai/<id>.mp3, which this app used to guess, is now 403 MissingKey.
+  async function fetchClip(id) {
+    const res = await fetch(CLIP_API + id);
+    if (!res.ok) throw new Error(`API HTTP ${res.status}`);
+    const data = await res.json();
+
+    if (!data.video_url) throw new Error('No downloadable audio for this song');
+
+    const title = (data.title || '').trim() || `suno-${id}`;
+    return { url: data.video_url, filename: `${sanitizeFilename(title)}.m4a`, title };
+  }
+
+  async function triggerDownload(url, filename) {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) throw new Error(`Download HTTP ${res.status}`);
     const blob = await res.blob();
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -113,18 +142,17 @@
   }
 
   async function downloadSingle() {
-    const input = document.getElementById('urlInput').value;
-    const id = extractId(input);
+    const id = extractId(document.getElementById('urlInput').value);
     if (!id) { setStatus('Invalid URL or ID', 'error'); return; }
 
-    const filename = `suno-${id}.mp3`;
-
-    setStatus(`Downloading ${filename}...`, 'info');
+    setStatus('Fetching song info...', 'info');
     try {
-      await triggerDownload(id, filename);
-      setStatus(`✓ Downloaded: ${filename}`, 'success');
-    } catch(e) {
-      setStatus(`Error: ${e.message}`, 'error');
+      const clip = await fetchClip(id);
+      setStatus(`Downloading ${clip.filename}...`, 'info');
+      await triggerDownload(clip.url, clip.filename);
+      setStatus(`✓ Downloaded: ${clip.filename}`, 'success');
+    } catch (e) {
+      setStatus(`Error: ${explain(e)}`, 'error');
     }
   }
 
@@ -138,7 +166,7 @@
       const item = document.createElement('div');
       item.className = 'q-item'; item.id = 'qi-' + id;
       item.innerHTML = `
-        <div class="q-name" id="qn-${id}">suno-${id}.mp3</div>
+        <div class="q-name" id="qn-${id}">${id}</div>
         <span class="q-state" id="qs-${id}">waiting</span>
         <button class="q-dl" onclick="downloadQueueItem('${id}')">⬇</button>
       `;
@@ -151,14 +179,19 @@
   async function downloadQueueItem(id) {
     const stateEl = document.getElementById('qs-' + id);
     const nameEl = document.getElementById('qn-' + id);
-    const filename = `suno-${id}.mp3`;
-    stateEl.textContent = 'downloading...'; stateEl.className = 'q-state loading';
+    stateEl.className = 'q-state loading';
     try {
-      await triggerDownload(id, filename);
+      stateEl.textContent = 'fetching...';
+      const clip = await fetchClip(id);
+      nameEl.textContent = clip.filename;
+      nameEl.title = clip.title;
+
+      stateEl.textContent = 'downloading...';
+      await triggerDownload(clip.url, clip.filename);
       stateEl.textContent = '✓ done'; stateEl.className = 'q-state done';
-    } catch(e) {
+    } catch (e) {
       stateEl.textContent = '✗ error'; stateEl.className = 'q-state err';
-      stateEl.title = e.message;
+      stateEl.title = explain(e);
     }
   }
 
