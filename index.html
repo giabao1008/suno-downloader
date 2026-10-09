@@ -79,7 +79,14 @@
 </div>
 
 <script>
-  const CLIP_API = 'https://studio-api-prod.suno.com/api/clip/';
+  // Suno only sends Access-Control-Allow-Origin for https://suno.com and
+  // http://localhost:<any port>. So on localhost we call the API directly, and
+  // anywhere else we go through /suno-api/*, which vercel.json rewrites to Suno
+  // server-side - that request is same-origin, so CORS never enters the picture.
+  const ON_LOCALHOST = location.hostname === 'localhost' && location.protocol === 'http:';
+  const CLIP_API = ON_LOCALHOST
+    ? 'https://studio-api-prod.suno.com/api/clip/'
+    : '/suno-api/clip/';
 
   function extractId(input) {
     const match = input.trim().match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
@@ -96,18 +103,21 @@
     el.className = 'status ' + type;
   }
 
-  // Suno's API only sends Access-Control-Allow-Origin for an allowlist of origins:
-  // https://suno.com and http://localhost:<any port>. Everything else - file://
-  // (Origin: null), http://127.0.0.1, and any deployed domain - gets no CORS header,
-  // so fetch() rejects with a bare TypeError before any response is seen.
-  const ORIGIN_OK = location.hostname === 'localhost' && location.protocol === 'http:';
-
+  // A blocked request surfaces as a bare TypeError with no status to report, so
+  // name the specific setup mistake instead of echoing "Failed to fetch".
   function explain(e) {
-    if (e instanceof TypeError && !ORIGIN_OK) {
-      return `Blocked by CORS: Suno only allows http://localhost. Serve this page from `
-           + `http://localhost:PORT (note: 127.0.0.1 and file:// do NOT work).`;
+    if (!(e instanceof TypeError)) return e.message;
+
+    if (location.protocol === 'file:') {
+      return 'Opening this file directly does not work. Run `npx serve` and open http://localhost:PORT';
     }
-    return e.message;
+    if (location.hostname === '127.0.0.1') {
+      return 'Use http://localhost:PORT, not 127.0.0.1 - Suno allows the localhost hostname only';
+    }
+    if (ON_LOCALHOST) {
+      return 'Could not reach the Suno API (offline, or Suno is down)';
+    }
+    return `Could not reach ${CLIP_API} - this deployment needs the /suno-api rewrite from vercel.json`;
   }
 
   // Picking the download URL is the whole trick, because two of the three the API
